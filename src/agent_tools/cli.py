@@ -1,0 +1,57 @@
+"""Command line entry point. Output is kept to one short line so it costs the agent few tokens."""
+from __future__ import annotations
+
+import argparse
+import sys
+from importlib import resources
+
+from . import CATALOG, __version__
+
+
+def _read_spec(arg: str) -> str:
+    if arg == "-":
+        return sys.stdin.read()
+    if arg.startswith("@"):
+        with open(arg[1:], encoding="utf-8") as f:
+            return f.read()
+    return arg
+
+
+def _docs(name: str) -> str:
+    return resources.files(f"agent_tools.{name}").joinpath("USAGE.md").read_text(encoding="utf-8")
+
+
+def main(argv=None) -> int:
+    ap = argparse.ArgumentParser(prog="agent-tools", description="Deterministic tools for AI agents.")
+    ap.add_argument("--version", action="version", version=f"agent-tools {__version__}")
+    sub = ap.add_subparsers(dest="cmd")
+    sub.add_parser("list", help="list tools, one line each")
+    d = sub.add_parser("docs", help="print a tool's compact usage")
+    d.add_argument("tool", choices=sorted(CATALOG))
+    c = sub.add_parser("chart", help="render a chart from a JSON spec")
+    c.add_argument("spec", help="JSON string, @file.json, or - for stdin")
+    c.add_argument("-o", "--out", default="chart.svg", help="output .svg/.png path, or - for SVG on stdout")
+    c.add_argument("--scale", type=float, default=2.0, help="PNG pixel scale (default 2)")
+    a = ap.parse_args(argv)
+
+    if a.cmd == "list":
+        for k, v in CATALOG.items():
+            print(f"{k}: {v}")
+        return 0
+    if a.cmd == "docs":
+        print(_docs(a.tool), end="")
+        return 0
+    if a.cmd == "chart":
+        from .chart import SpecError, render, save
+        try:
+            spec = _read_spec(a.spec)
+            if a.out == "-":
+                sys.stdout.write(render(spec) + "\n")
+            else:
+                print(save(spec, a.out, a.scale))
+        except (SpecError, OSError) as e:
+            print(f"error: {e}", file=sys.stderr)
+            return 2
+        return 0
+    ap.print_help()
+    return 1

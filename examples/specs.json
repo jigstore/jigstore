@@ -1,0 +1,16 @@
+{
+  "bar": {"type": "bar", "title": "Revenue by region", "subtitle": "FY2026, USD", "data": {"North": 1240000, "South": 905000, "East": 1530000, "West": 712000}, "prefix": "$"},
+  "bar-grouped": {"type": "bar", "title": "Signups by quarter", "x": ["Q1", "Q2", "Q3", "Q4"], "series": {"2025": [320, 410, 380, 520], "2026": [400, 470, 515, 610]}},
+  "bar-stacked": {"type": "bar", "stack": true, "title": "Tickets by priority", "x": ["Mon", "Tue", "Wed", "Thu", "Fri"], "series": {"Low": [12, 15, 9, 14, 10], "Medium": [8, 6, 11, 7, 9], "High": [3, 5, 2, 6, 4]}},
+  "hbar": {"type": "hbar", "title": "Most used languages", "sort": "desc", "data": {"Python": 48.2, "JavaScript": 41.1, "TypeScript": 38.5, "Go": 14.4, "Rust": 12.6, "Java": 30.3, "C#": 27.1}, "suffix": "%"},
+  "line": {"type": "line", "title": "Weekly active users", "x": ["W1", "W2", "W3", "W4", "W5", "W6", "W7", "W8"], "series": {"Web": [1200, 1350, 1310, 1480, 1620, 1580, 1750, 1900], "Mobile": [800, 920, 1010, 1150, 1240, 1400, 1520, 1690]}},
+  "area": {"type": "area", "title": "Requests per hour", "x": ["00", "03", "06", "09", "12", "15", "18", "21"], "series": {"API": [120, 80, 150, 620, 840, 790, 560, 300]}},
+  "area-stacked": {"type": "area", "stack": true, "title": "Storage by tier (TB)", "x": [2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026], "series": {"Hot": [4, 6, 9, 13, 18, 24, 31, 40], "Warm": [2, 3, 5, 8, 12, 15, 19, 22], "Cold": [1, 2, 4, 7, 11, 16, 22, 30]}},
+  "scatter": {"type": "scatter", "title": "Price vs rating", "xlabel": "Price ($)", "ylabel": "Rating", "series": {"Laptops": [[899, 4.1], [1299, 4.5], [1599, 4.6], [699, 3.8], [1999, 4.7]], "Tablets": [[329, 4.0], [599, 4.3], [799, 4.4], [449, 3.9]]}},
+  "pie": {"type": "pie", "title": "Traffic sources", "data": {"Search": 5200, "Direct": 2300, "Social": 1500, "Email": 640, "Referral": 410}},
+  "donut": {"type": "donut", "title": "Cloud spend", "data": {"Compute": 48200, "Storage": 15100, "Network": 9800, "Database": 21400, "Other": 3100}, "prefix": "$", "center_label": "Monthly total"},
+  "histogram": {"type": "histogram", "title": "Response time (ms)", "values": [112, 98, 134, 145, 120, 88, 167, 201, 99, 105, 131, 142, 156, 119, 125, 110, 178, 190, 95, 101, 138, 149, 160, 115, 122, 128, 133, 140, 152, 171, 230, 92, 108, 117, 126]},
+  "dark": {"type": "bar", "theme": "dark", "title": "Deploys per team", "data": {"Platform": 42, "Payments": 31, "Search": 27, "Mobile": 19, "Data": 24}},
+  "long-labels": {"type": "bar", "title": "Claims by line of business", "data": {"Commercial Auto Liability": 412, "Workers Compensation": 388, "General Liability": 270, "Commercial Property": 190, "Professional Liability (E&O)": 95, "Inland Marine": 60}},
+  "negative": {"type": "bar", "title": "Net change by month", "data": {"Jan": 12, "Feb": -8, "Mar": 15, "Apr": -3, "May": 22, "Jun": -11}}
+}
