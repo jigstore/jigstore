@@ -1,5 +1,8 @@
 # agent-tools
 
+[![ci](https://github.com/ankit22sharma/agent-tools/actions/workflows/ci.yml/badge.svg)](https://github.com/ankit22sharma/agent-tools/actions/workflows/ci.yml)
+[![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
 Ready-made tools for AI agents. Instead of having a model generate an SVG, a chart
 script or a document token by token, the agent writes a short spec and a deterministic
 tool does the rest. The output is the same every time, and the model spends about
@@ -37,6 +40,7 @@ From Python:
 
 ```python
 from agent_tools.chart import render, save
+
 svg = render({"type": "donut", "data": {"Compute": 48, "Storage": 15}})
 save({"type": "line", "x": ["Q1", "Q2"], "series": {"Web": [3, 5]}}, "out.png")
 ```
@@ -81,16 +85,38 @@ install and a second round trip when the code fails.
 
 ## Using it from an agent
 
-Copy [`AGENTS.md`](AGENTS.md) into your agent's instructions, or let the agent run
-`agent-tools docs chart` when it needs the spec format (about 200 tokens). A CLI keeps
-the cost at zero until the tool is used. An MCP server would put its tool schema into
-context on every turn, so it is not the default here.
+**Shell access (cheapest).** Copy [`AGENTS.md`](AGENTS.md) into your agent's instructions,
+or let the agent run `agent-tools docs chart` when it needs the spec format (about
+200 tokens). Nothing is loaded into context until the tool is used.
+
+**MCP.** Add the server to any MCP client (Claude, Kiro, Cursor, VS Code and others):
+
+```json
+{
+  "mcpServers": {
+    "agent-tools": {
+      "command": "uvx",
+      "args": ["--from", "git+https://github.com/ankit22sharma/agent-tools", "agent-tools", "mcp"],
+      "env": { "AGENT_TOOLS_OUT_DIR": "/path/to/charts" }
+    }
+  }
+}
+```
+
+The server exposes one `chart` tool. Its schema is about 130 tokens, which the client
+sends with every turn. The full spec format is returned only when a call fails, so it
+costs nothing while the model gets specs right. Arguments: `spec` (required), `out`
+(a `.svg` or `.png` path), and `view: true` to also get a PNG back so the model can
+check the result. When `AGENT_TOOLS_OUT_DIR` is set, files can only be written inside it.
+
+The server has no dependencies and supports both the 2026-07-28 stateless MCP protocol
+and the older `initialize` handshake (2024-11-05 to 2025-11-25).
 
 ## Adding a tool
 
 Each tool lives in `src/agent_tools/<name>/` with a `USAGE.md` of 300 tokens or less,
-a CLI subcommand, an entry in `CATALOG`, examples and tests. Tools must be
-deterministic, dependency-free where possible, and print short output.
+a CLI subcommand, an entry in `CATALOG` and the MCP tool list, examples and tests.
+See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License
 

@@ -2,6 +2,7 @@
 
 Tokens are estimated as characters / 4, a common rule of thumb for English and JSON.
 """
+
 import json
 import os
 import sys
