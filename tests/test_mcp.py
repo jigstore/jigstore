@@ -43,7 +43,7 @@ class Legacy(unittest.TestCase):
             self.assertEqual(r[0]["result"]["protocolVersion"], "2025-06-18")
             self.assertEqual(r[1]["result"]["tools"][0]["name"], "chart")
             self.assertFalse(r[2]["result"]["isError"])
-            self.assertEqual(r[2]["result"]["content"][0]["text"], out)
+            self.assertEqual(os.path.realpath(r[2]["result"]["content"][0]["text"]), os.path.realpath(out))
             self.assertTrue(os.path.exists(out))
 
     def test_unknown_version_falls_back(self):
