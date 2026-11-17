@@ -1,6 +1,7 @@
 # Contributing
 
-Thanks for helping. Bug reports, new chart options and new tools are all welcome.
+Thanks for helping. Bug reports, new chart options and new tools are all welcome. If you'd
+rather support the work another way, you can [buy me a coffee](https://buymeacoffee.com/ankit22sharma).
 
 ## Setup
 

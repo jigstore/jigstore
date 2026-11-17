@@ -53,9 +53,11 @@ jobs:
           test -s "$RUNNER_TEMP/c.svg"
 
   test-macos:
-    # macOS runners don't pick up jobs for this repo while it is private; runs once it is public.
+    # Informational, not a required check: hosted macOS runners can queue for a long time.
+    # Skipped while the repo is private, where macOS minutes are billed at 10x.
     if: ${{ !github.event.repository.private }}
     runs-on: macos-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:

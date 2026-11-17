@@ -2,6 +2,7 @@
 
 [![ci](https://github.com/jigstore/jigstore/actions/workflows/ci.yml/badge.svg)](https://github.com/jigstore/jigstore/actions/workflows/ci.yml)
 [![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Buy me a coffee](https://img.shields.io/badge/buy%20me%20a%20coffee-support-e8590c.svg)](https://buymeacoffee.com/ankit22sharma)
 
 Ready-made tools for AI agents. In a workshop, a jig lets you repeat a precise job every
 time without redoing the setup. Jigstore does the same for agents: instead of having a
@@ -118,6 +119,12 @@ and the older `initialize` handshake (2024-11-05 to 2025-11-25).
 Each tool lives in `src/jigstore/<name>/` with a `USAGE.md` of 300 tokens or less,
 a CLI subcommand, an entry in `CATALOG` and the MCP tool list, examples and tests.
 See [CONTRIBUTING.md](CONTRIBUTING.md).
+
+## Support the project
+
+Jigstore is built and maintained by one person. If it saves your agents tokens, you can
+[buy me a coffee](https://buymeacoffee.com/ankit22sharma). Bug reports, tool ideas and pull
+requests help just as much.
 
 ## License
 

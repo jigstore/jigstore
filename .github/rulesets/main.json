@@ -63,9 +63,6 @@
           },
           {
             "context": "test (windows-latest, 3.13)"
-          },
-          {
-            "context": "test-macos"
           }
         ]
       }
