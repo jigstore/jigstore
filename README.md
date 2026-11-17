@@ -2,6 +2,7 @@
 
 [![ci](https://github.com/jigstore/jigstore/actions/workflows/ci.yml/badge.svg)](https://github.com/jigstore/jigstore/actions/workflows/ci.yml)
 [![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Sponsor](https://img.shields.io/badge/sponsor-GitHub%20Sponsors-ea4aaa.svg)](https://github.com/sponsors/ankit22sharma)
 [![Buy me a coffee](https://img.shields.io/badge/buy%20me%20a%20coffee-support-e8590c.svg)](https://buymeacoffee.com/ankit22sharma)
 
 Ready-made tools for AI agents. In a workshop, a jig lets you repeat a precise job every
@@ -123,6 +124,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md).
 ## Support the project
 
 Jigstore is built and maintained by one person. If it saves your agents tokens, you can
+[sponsor it on GitHub](https://github.com/sponsors/ankit22sharma) or
 [buy me a coffee](https://buymeacoffee.com/ankit22sharma). Bug reports, tool ideas and pull
 requests help just as much.
 
