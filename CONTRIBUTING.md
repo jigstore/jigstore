@@ -42,5 +42,12 @@ Use short, imperative commit messages. Add a line under `Unreleased` in `CHANGEL
 for user-visible changes. Maintainers release by bumping `__version__`, moving the
 changelog entries under the new version, and pushing a `vX.Y.Z` tag.
 
+## How changes reach `main`
+
+`main` is protected (see `.github/rulesets/main.json`): every change goes through a pull
+request, CI must pass, a code owner must approve, review threads must be resolved, and PRs
+are squash-merged. Force pushes and branch deletion are blocked. First-time contributors'
+CI runs wait for a maintainer to approve them.
+
 By contributing you agree that your work is released under the MIT License and that you
 follow the [Code of Conduct](CODE_OF_CONDUCT.md).
