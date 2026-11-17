@@ -5,7 +5,7 @@ Thanks for helping. Bug reports, new chart options and new tools are all welcome
 ## Setup
 
 ```sh
-git clone https://github.com/ankit22sharma/jigstore && cd jigstore
+git clone https://github.com/jigstore/jigstore && cd jigstore
 python -m venv .venv && . .venv/bin/activate
 pip install -e . ruff pre-commit
 pre-commit install

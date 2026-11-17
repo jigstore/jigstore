@@ -1,6 +1,6 @@
 # Jigstore
 
-[![ci](https://github.com/ankit22sharma/jigstore/actions/workflows/ci.yml/badge.svg)](https://github.com/ankit22sharma/jigstore/actions/workflows/ci.yml)
+[![ci](https://github.com/jigstore/jigstore/actions/workflows/ci.yml/badge.svg)](https://github.com/jigstore/jigstore/actions/workflows/ci.yml)
 [![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 Ready-made tools for AI agents. In a workshop, a jig lets you repeat a precise job every
@@ -18,9 +18,9 @@ Each tool is a jig in this catalog. The first one is a chart builder.
 ## Install
 
 ```sh
-pip install "git+https://github.com/ankit22sharma/jigstore"
+pip install "git+https://github.com/jigstore/jigstore"
 # PNG output: also install cairosvg, or have rsvg-convert on PATH
-pip install "jigstore[png] @ git+https://github.com/ankit22sharma/jigstore"
+pip install "jigstore[png] @ git+https://github.com/jigstore/jigstore"
 ```
 
 No runtime dependencies. Python 3.10+.
@@ -97,7 +97,7 @@ or let the agent run `jigstore docs chart` when it needs the spec format (about
   "mcpServers": {
     "jigstore": {
       "command": "uvx",
-      "args": ["--from", "git+https://github.com/ankit22sharma/jigstore", "jigstore", "mcp"],
+      "args": ["--from", "git+https://github.com/jigstore/jigstore", "jigstore", "mcp"],
       "env": { "JIGSTORE_OUT_DIR": "/path/to/charts" }
     }
   }

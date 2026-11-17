@@ -27,5 +27,5 @@ All notable changes are listed here. The format follows
 - Chart builder: bar, hbar, line, area, scatter, pie, donut and histogram from a JSON spec
   to SVG or PNG, with a CLI and a Python API.
 
-[Unreleased]: https://github.com/ankit22sharma/jigstore/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/ankit22sharma/jigstore/releases/tag/v0.1.0
+[Unreleased]: https://github.com/jigstore/jigstore/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/jigstore/jigstore/releases/tag/v0.1.0

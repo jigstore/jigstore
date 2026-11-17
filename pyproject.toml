@@ -30,9 +30,9 @@ png = ["cairosvg>=2.5"]
 jigstore = "jigstore.cli:main"
 
 [project.urls]
-Homepage = "https://github.com/ankit22sharma/jigstore"
-Issues = "https://github.com/ankit22sharma/jigstore/issues"
-Changelog = "https://github.com/ankit22sharma/jigstore/blob/main/CHANGELOG.md"
+Homepage = "https://github.com/jigstore/jigstore"
+Issues = "https://github.com/jigstore/jigstore/issues"
+Changelog = "https://github.com/jigstore/jigstore/blob/main/CHANGELOG.md"
 
 [tool.setuptools.packages.find]
 where = ["src"]
