@@ -24,7 +24,7 @@ def to_png(svg: str, scale: float = 2.0) -> bytes:
             return r.stdout
         raise SpecError(f"rsvg-convert failed: {r.stderr.decode(errors='replace').strip()}")
     raise SpecError(
-        "PNG needs cairosvg (pip install 'agent-tools[png]') or rsvg-convert "
+        "PNG needs cairosvg (pip install 'jigstore[png]') or rsvg-convert "
         "(brew install librsvg / apt install librsvg2-bin); or write .svg instead"
     )
 

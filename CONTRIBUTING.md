@@ -5,7 +5,7 @@ Thanks for helping. Bug reports, new chart options and new tools are all welcome
 ## Setup
 
 ```sh
-git clone https://github.com/ankit22sharma/agent-tools && cd agent-tools
+git clone https://github.com/ankit22sharma/jigstore && cd jigstore
 python -m venv .venv && . .venv/bin/activate
 pip install -e . ruff pre-commit
 pre-commit install
@@ -33,7 +33,7 @@ A tool belongs here if an agent would otherwise generate the output token by tok
 - **`USAGE.md` stays under 300 tokens.** It is what an agent reads to learn the tool.
 - **The MCP tool description stays under 150 tokens.** Clients load it on every turn.
 
-Each tool lives in `src/agent_tools/<name>/` with `USAGE.md`, a CLI subcommand, an
+Each tool lives in `src/jigstore/<name>/` with `USAGE.md`, a CLI subcommand, an
 entry in `CATALOG` and the MCP `TOOLS` list, examples and tests.
 
 ## Commits and releases

@@ -19,7 +19,7 @@ jobs:
           python-version: "3.13"
       - name: Tag matches package version
         run: |
-          v=$(python -c "import sys; sys.path.insert(0, 'src'); import agent_tools; print(agent_tools.__version__)")
+          v=$(python -c "import sys; sys.path.insert(0, 'src'); import jigstore; print(jigstore.__version__)")
           test "v$v" = "$GITHUB_REF_NAME" || { echo "tag $GITHUB_REF_NAME != version $v"; exit 1; }
       - run: pip install build twine
       - run: python -m build

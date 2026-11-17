@@ -51,7 +51,7 @@ jobs:
       - name: CLI smoke test
         shell: bash
         run: |
-          agent-tools chart '{"type":"pie","data":{"a":1,"b":2}}' -o "$RUNNER_TEMP/c.svg"
+          jigstore chart '{"type":"pie","data":{"a":1,"b":2}}' -o "$RUNNER_TEMP/c.svg"
           test -s "$RUNNER_TEMP/c.svg"
 
   build:

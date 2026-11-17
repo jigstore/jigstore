@@ -4,7 +4,7 @@ import os
 import tempfile
 import unittest
 
-from agent_tools.mcp import TOOLS, serve
+from jigstore.mcp import TOOLS, serve
 
 MODERN_META = {"io.modelcontextprotocol/protocolVersion": "2026-07-28"}
 
@@ -58,7 +58,7 @@ class Modern(unittest.TestCase):
         ]
         self.assertEqual(r["resultType"], "complete")
         self.assertIn("2026-07-28", r["supportedVersions"])
-        self.assertEqual(r["_meta"]["io.modelcontextprotocol/serverInfo"]["name"], "agent-tools")
+        self.assertEqual(r["_meta"]["io.modelcontextprotocol/serverInfo"]["name"], "jigstore")
 
     def test_stateless_list_and_call(self):
         with tempfile.TemporaryDirectory() as d:
@@ -112,7 +112,7 @@ class Behaviour(unittest.TestCase):
 
     def test_default_output_dir(self):
         with tempfile.TemporaryDirectory() as d:
-            os.environ["AGENT_TOOLS_OUT_DIR"] = d
+            os.environ["JIGSTORE_OUT_DIR"] = d
             try:
                 r = run(
                     {
@@ -123,14 +123,14 @@ class Behaviour(unittest.TestCase):
                     }
                 )[0]["result"]
             finally:
-                del os.environ["AGENT_TOOLS_OUT_DIR"]
+                del os.environ["JIGSTORE_OUT_DIR"]
             path = r["content"][0]["text"]
             self.assertTrue(path.startswith(os.path.realpath(d)) or path.startswith(d))
             self.assertTrue(os.path.exists(path))
 
     def test_out_dir_blocks_escape(self):
         with tempfile.TemporaryDirectory() as d:
-            os.environ["AGENT_TOOLS_OUT_DIR"] = d
+            os.environ["JIGSTORE_OUT_DIR"] = d
             try:
                 r = run(
                     {
@@ -141,7 +141,7 @@ class Behaviour(unittest.TestCase):
                     }
                 )
             finally:
-                del os.environ["AGENT_TOOLS_OUT_DIR"]
+                del os.environ["JIGSTORE_OUT_DIR"]
             self.assertTrue(r[0]["result"]["isError"])
             self.assertFalse(os.path.exists(os.path.join(os.path.dirname(d), "escape.svg")))
 

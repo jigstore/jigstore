@@ -9,7 +9,7 @@ pull requests or any other project space.
 ## Reporting
 
 Report unacceptable behaviour privately to the maintainer through a
-[private security advisory](https://github.com/ankit22sharma/agent-tools/security/advisories/new)
+[private security advisory](https://github.com/ankit22sharma/jigstore/security/advisories/new)
 or by contacting [@ankit22sharma](https://github.com/ankit22sharma) on GitHub.
 Reports are handled confidentially. The maintainer may remove content and block
 participants who break these rules, following the enforcement guidelines in the

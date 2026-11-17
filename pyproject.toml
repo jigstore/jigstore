@@ -3,7 +3,7 @@ requires = ["setuptools>=61"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "agent-tools"
+name = "jigstore"
 version = "0.1.0"
 description = "Deterministic tools for AI agents: write a short spec instead of generating the output."
 readme = "README.md"
@@ -27,12 +27,12 @@ classifiers = [
 png = ["cairosvg>=2.5"]
 
 [project.scripts]
-agent-tools = "agent_tools.cli:main"
+jigstore = "jigstore.cli:main"
 
 [project.urls]
-Homepage = "https://github.com/ankit22sharma/agent-tools"
-Issues = "https://github.com/ankit22sharma/agent-tools/issues"
-Changelog = "https://github.com/ankit22sharma/agent-tools/blob/main/CHANGELOG.md"
+Homepage = "https://github.com/ankit22sharma/jigstore"
+Issues = "https://github.com/ankit22sharma/jigstore/issues"
+Changelog = "https://github.com/ankit22sharma/jigstore/blob/main/CHANGELOG.md"
 
 [tool.setuptools.packages.find]
 where = ["src"]

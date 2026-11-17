@@ -21,7 +21,7 @@ body:
     id: version
     attributes:
       label: Version and platform
-      placeholder: "agent-tools 0.1.0, Python 3.12, macOS"
+      placeholder: "jigstore 0.1.0, Python 3.12, macOS"
     validations:
       required: true
   - type: dropdown

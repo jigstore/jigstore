@@ -18,7 +18,7 @@ from . import __version__
 
 MODERN = ["2026-07-28"]
 LEGACY = ["2025-11-25", "2025-06-18", "2025-03-26", "2024-11-05"]
-SERVER_INFO = {"name": "agent-tools", "version": __version__}
+SERVER_INFO = {"name": "jigstore", "version": __version__}
 PV = "io.modelcontextprotocol/protocolVersion"
 
 TOOLS = [
@@ -56,12 +56,12 @@ class ToolError(Exception):
 def _usage():
     from importlib import resources
 
-    return resources.files("agent_tools.chart").joinpath("USAGE.md").read_text(encoding="utf-8")
+    return resources.files("jigstore.chart").joinpath("USAGE.md").read_text(encoding="utf-8")
 
 
 def _out_path(out, svg):
-    """Resolve the output path. With AGENT_TOOLS_OUT_DIR set, writes stay inside it."""
-    root = os.environ.get("AGENT_TOOLS_OUT_DIR")
+    """Resolve the output path. With JIGSTORE_OUT_DIR set, writes stay inside it."""
+    root = os.environ.get("JIGSTORE_OUT_DIR")
     base = os.path.realpath(os.path.expanduser(root)) if root else os.getcwd()
     if not out:
         out = f"chart-{hashlib.sha256(svg.encode()).hexdigest()[:10]}.svg"

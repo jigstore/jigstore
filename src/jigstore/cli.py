@@ -19,12 +19,12 @@ def _read_spec(arg: str) -> str:
 
 
 def _docs(name: str) -> str:
-    return resources.files(f"agent_tools.{name}").joinpath("USAGE.md").read_text(encoding="utf-8")
+    return resources.files(f"jigstore.{name}").joinpath("USAGE.md").read_text(encoding="utf-8")
 
 
 def main(argv=None) -> int:
-    ap = argparse.ArgumentParser(prog="agent-tools", description="Deterministic tools for AI agents.")
-    ap.add_argument("--version", action="version", version=f"agent-tools {__version__}")
+    ap = argparse.ArgumentParser(prog="jigstore", description="Deterministic tools for AI agents.")
+    ap.add_argument("--version", action="version", version=f"jigstore {__version__}")
     sub = ap.add_subparsers(dest="cmd")
     sub.add_parser("list", help="list tools, one line each")
     sub.add_parser("mcp", help="run the MCP server on stdio")

@@ -7,7 +7,7 @@ Security fixes go into the latest release only.
 ## Reporting a vulnerability
 
 Please do not open a public issue. Report it privately through
-[GitHub's private vulnerability reporting](https://github.com/ankit22sharma/agent-tools/security/advisories/new).
+[GitHub's private vulnerability reporting](https://github.com/ankit22sharma/jigstore/security/advisories/new).
 Include the spec or input that triggers the problem and what you observed.
 
 You can expect an acknowledgement within 5 working days and a fix or a plan within 30 days.
