@@ -71,7 +71,7 @@ def _out_path(out, svg):
     return path
 
 
-def call_chart(args: dict) -> list:
+def call_chart(args: dict, ctx: dict | None = None) -> list:
     from .chart import SpecError, render, save, to_png
 
     spec = args.get("spec")
@@ -96,16 +96,32 @@ def call_chart(args: dict) -> list:
 
 
 HANDLERS = {"chart": call_chart}
+INSTRUCTIONS = "Call chart with a JSON spec instead of writing SVG yourself."
 
 
-def handle(msg: dict, state: dict):
-    """Return a response dict, or None for notifications."""
+class Toolset:
+    """What a server exposes. The hosted service passes its own toolset to reuse this protocol code.
+
+    Each handler is called as handler(arguments, ctx) and returns MCP content, or raises ToolError.
+    """
+
+    def __init__(self, tools, handlers, server_info=None, instructions=INSTRUCTIONS):
+        self.tools, self.handlers = tools, handlers
+        self.server_info = server_info or SERVER_INFO
+        self.instructions = instructions
+
+
+LOCAL = Toolset(TOOLS, HANDLERS)
+
+
+def handle(msg: dict, state: dict, toolset: Toolset = LOCAL):
+    """Return a response dict, or None for notifications. `state` is passed to handlers as ctx."""
     method, mid = msg.get("method"), msg.get("id")
     params = msg.get("params") or {}
     if mid is None:  # notification (initialized, cancelled, ...): nothing to send
         return None
     try:
-        result = dispatch(method, params, state)
+        result = dispatch(method, params, state, toolset)
         return {"jsonrpc": "2.0", "id": mid, "result": result}
     except RpcError as e:
         err = {"code": e.code, "message": e.message}
@@ -114,7 +130,8 @@ def handle(msg: dict, state: dict):
         return {"jsonrpc": "2.0", "id": mid, "error": err}
 
 
-def dispatch(method, params, state):
+def dispatch(method, params, state, toolset: Toolset = LOCAL):
+    ts = toolset
     meta = params.get("_meta") or {}
     version = meta.get(PV)
     modern = version is not None
@@ -125,8 +142,8 @@ def dispatch(method, params, state):
         return {
             "protocolVersion": state["legacy"],
             "capabilities": {"tools": {}},
-            "serverInfo": SERVER_INFO,
-            "instructions": "Call chart with a JSON spec instead of writing SVG yourself.",
+            "serverInfo": ts.server_info,
+            "instructions": ts.instructions,
         }
     if method == "ping":
         return {}
@@ -136,7 +153,7 @@ def dispatch(method, params, state):
     def done(r):
         if modern or method == "server/discover":
             r["resultType"] = "complete"
-            r.setdefault("_meta", {})["io.modelcontextprotocol/serverInfo"] = SERVER_INFO
+            r.setdefault("_meta", {})["io.modelcontextprotocol/serverInfo"] = ts.server_info
         return r
 
     if method == "server/discover":
@@ -144,23 +161,23 @@ def dispatch(method, params, state):
             {
                 "supportedVersions": MODERN + LEGACY,
                 "capabilities": {"tools": {}},
-                "instructions": "Call chart with a JSON spec instead of writing SVG yourself.",
+                "instructions": ts.instructions,
                 "ttlMs": 3600000,
                 "cacheScope": "public",
             }
         )
     if method == "tools/list":
-        r = {"tools": TOOLS}
+        r = {"tools": ts.tools}
         if modern:
             r.update(ttlMs=3600000, cacheScope="public")
         return done(r)
     if method == "tools/call":
         name = params.get("name")
-        fn = HANDLERS.get(name)
+        fn = ts.handlers.get(name)
         if fn is None:
             raise RpcError(-32602, f"Unknown tool: {name}")
         try:
-            return done({"content": fn(params.get("arguments") or {}), "isError": False})
+            return done({"content": fn(params.get("arguments") or {}, state), "isError": False})
         except ToolError as e:
             return done({"content": [{"type": "text", "text": str(e)}], "isError": True})
     raise RpcError(-32601, f"Method not found: {method}")
