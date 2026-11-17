@@ -2,6 +2,7 @@
 
 Tokens are estimated as characters / 4, a common rule of thumb for English and JSON.
 """
+
 import json
 import os
 import sys
@@ -9,7 +10,7 @@ import sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "src"))
 
-from agent_tools.chart import render  # noqa: E402
+from jigstore.chart import render  # noqa: E402
 
 specs = json.load(open(os.path.join(ROOT, "examples", "specs.json"), encoding="utf-8"))
 print("| chart | spec tokens | SVG tokens | saved |")

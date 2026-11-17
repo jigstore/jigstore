@@ -1,4 +1,5 @@
 """Optional PNG output. Uses cairosvg if installed, else the rsvg-convert binary."""
+
 from __future__ import annotations
 
 import os
@@ -18,13 +19,14 @@ def to_png(svg: str, scale: float = 2.0) -> bytes:
         return cairosvg.svg2png(bytestring=svg.encode(), scale=scale)
     exe = shutil.which("rsvg-convert")
     if exe:
-        r = subprocess.run([exe, "-z", str(scale), "-f", "png"], input=svg.encode(),
-                           capture_output=True, check=False)
+        r = subprocess.run([exe, "-z", str(scale), "-f", "png"], input=svg.encode(), capture_output=True, check=False)
         if r.returncode == 0:
             return r.stdout
         raise SpecError(f"rsvg-convert failed: {r.stderr.decode(errors='replace').strip()}")
-    raise SpecError("PNG needs cairosvg (pip install 'agent-tools[png]') or rsvg-convert "
-                    "(brew install librsvg / apt install librsvg2-bin); or write .svg instead")
+    raise SpecError(
+        "PNG needs cairosvg (pip install 'jigstore[png]') or rsvg-convert "
+        "(brew install librsvg / apt install librsvg2-bin); or write .svg instead"
+    )
 
 
 def save(spec, path: str, scale: float = 2.0) -> str:

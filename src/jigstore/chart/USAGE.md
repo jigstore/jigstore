@@ -1,6 +1,6 @@
 # chart
 
-`agent-tools chart '<json>' [-o out.svg|out.png]` prints the output path.
+`jigstore chart '<json>' [-o out.svg|out.png]` prints the output path.
 Spec can also be `@file.json` or `-` (stdin). `-o -` prints the SVG.
 
 Types: bar hbar line area scatter pie donut histogram
@@ -16,4 +16,4 @@ prefix("$") suffix("%") stack(bar/area) sort(asc|desc) labels(bool)
 colors([..] or {name:color}) zero(line from 0) dots(bool)
 pie/donut: max_slices(8) hole(0.6) center center_label
 
-Example: `agent-tools chart '{"type":"bar","title":"Sales","data":{"N":12,"S":9},"prefix":"$"}' -o sales.png`
+Example: `jigstore chart '{"type":"bar","title":"Sales","data":{"N":12,"S":9},"prefix":"$"}' -o sales.png`

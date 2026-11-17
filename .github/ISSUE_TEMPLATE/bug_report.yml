@@ -1,0 +1,31 @@
+name: Bug report
+description: A tool crashed, rejected a valid spec, or produced wrong or ugly output.
+labels: [bug]
+body:
+  - type: textarea
+    id: spec
+    attributes:
+      label: Spec
+      description: The exact JSON spec or command you ran.
+      render: json
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened and what you expected
+      description: Paste the error, or attach a screenshot of the output.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version and platform
+      placeholder: "jigstore 0.1.0, Python 3.12, macOS"
+    validations:
+      required: true
+  - type: dropdown
+    id: via
+    attributes:
+      label: How was it called?
+      options: [CLI, MCP server, Python library]

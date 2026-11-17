@@ -6,8 +6,8 @@ import tempfile
 import unittest
 import xml.etree.ElementTree as ET
 
-from agent_tools.chart import SpecError, TYPES, render
-from agent_tools.chart.render import fmt, ticks
+from jigstore.chart import TYPES, SpecError, render
+from jigstore.chart.render import fmt, ticks
 
 HERE = os.path.dirname(__file__)
 SPECS = json.load(open(os.path.join(HERE, "..", "examples", "specs.json"), encoding="utf-8"))
@@ -98,8 +98,9 @@ class Helpers(unittest.TestCase):
 class Cli(unittest.TestCase):
     def run_cli(self, *args, stdin=None):
         env = dict(os.environ, PYTHONPATH=os.path.join(HERE, "..", "src"))
-        return subprocess.run([sys.executable, "-m", "agent_tools", *args], input=stdin,
-                              capture_output=True, text=True, env=env)
+        return subprocess.run(
+            [sys.executable, "-m", "jigstore", *args], input=stdin, capture_output=True, text=True, env=env
+        )
 
     def test_chart_to_file(self):
         with tempfile.TemporaryDirectory() as d:

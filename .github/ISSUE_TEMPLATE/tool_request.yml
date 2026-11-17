@@ -1,0 +1,20 @@
+name: Tool or feature request
+description: Suggest a new tool for the catalog, or a new option or chart type.
+labels: [enhancement]
+body:
+  - type: textarea
+    id: task
+    attributes:
+      label: What do agents currently generate by hand?
+      description: The output an agent writes token by token today, and roughly how long it is.
+    validations:
+      required: true
+  - type: textarea
+    id: spec
+    attributes:
+      label: What would the short spec look like?
+      render: json
+  - type: textarea
+    id: notes
+    attributes:
+      label: Anything else

@@ -2,6 +2,7 @@
 
 Input is a small dict ("spec"); output is a compact, self-contained SVG string.
 """
+
 from __future__ import annotations
 
 import json
@@ -14,22 +15,43 @@ class SpecError(ValueError):
 
 
 PALETTES = {
-    "light": ["#4e79a7", "#f28e2b", "#e15759", "#76b7b2", "#59a14f",
-              "#edc948", "#b07aa1", "#ff9da7", "#9c755f", "#bab0ac"],
-    "dark": ["#6aa5e8", "#f9a14a", "#f0716f", "#8fd3cc", "#7cc56f",
-             "#f2d45c", "#c79bd0", "#ffb3bb", "#c19a7f", "#cfc6c2"],
+    "light": [
+        "#4e79a7",
+        "#f28e2b",
+        "#e15759",
+        "#76b7b2",
+        "#59a14f",
+        "#edc948",
+        "#b07aa1",
+        "#ff9da7",
+        "#9c755f",
+        "#bab0ac",
+    ],
+    "dark": [
+        "#6aa5e8",
+        "#f9a14a",
+        "#f0716f",
+        "#8fd3cc",
+        "#7cc56f",
+        "#f2d45c",
+        "#c79bd0",
+        "#ffb3bb",
+        "#c19a7f",
+        "#cfc6c2",
+    ],
 }
 THEMES = {
     "light": {"bg": "#ffffff", "fg": "#1f2937", "muted": "#6b7280", "grid": "#e5e7eb", "axis": "#9ca3af"},
     "dark": {"bg": "#0f172a", "fg": "#e2e8f0", "muted": "#94a3b8", "grid": "#1e293b", "axis": "#475569"},
 }
 FONT = "system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif"
+MAX_POINTS = 10000
 TYPES = ("bar", "hbar", "line", "area", "scatter", "pie", "donut", "histogram")
 
 # ---------------------------------------------------------------- helpers
 
 _NARROW = set("il.,:;|!'`")
-_SEMI = set("fjtrI()[]{}/\\- \"")
+_SEMI = set('fjtrI()[]{}/\\- "')
 _WIDE = set("mwMW@%")
 
 
@@ -74,12 +96,12 @@ def n(x):
 
 def _nice(x, rnd):
     e = math.floor(math.log10(x))
-    f = x / 10 ** e
+    f = x / 10**e
     if rnd:
         m = 1 if f < 1.5 else 2 if f < 3 else 5 if f < 7 else 10
     else:
         m = 1 if f <= 1 else 2 if f <= 2 else 5 if f <= 5 else 10
-    return m * 10 ** e
+    return m * 10**e
 
 
 def ticks(lo, hi, count=5):
@@ -134,7 +156,7 @@ def _lum(c):
     if len(c) == 3:
         c = "".join(ch * 2 for ch in c)
     try:
-        r, g, b = (int(c[i:i + 2], 16) / 255 for i in (0, 2, 4))
+        r, g, b = (int(c[i : i + 2], 16) / 255 for i in (0, 2, 4))
     except ValueError:
         return 0.0
     f = lambda u: u / 12.92 if u <= 0.03928 else ((u + 0.055) / 1.055) ** 2.4  # noqa: E731
@@ -160,6 +182,7 @@ def _isnum(v):
 
 # ---------------------------------------------------------------- canvas
 
+
 class Canvas:
     def __init__(self, spec):
         self.s = spec
@@ -170,8 +193,8 @@ class Canvas:
         self.pal = PALETTES[theme]
         self.W = int(spec.get("w", spec.get("width", 640)))
         self.H = int(spec.get("h", spec.get("height", 400)))
-        if self.W < 160 or self.H < 120:
-            raise SpecError("w must be >= 160 and h >= 120")
+        if not (160 <= self.W <= 4000 and 120 <= self.H <= 4000):
+            raise SpecError("w must be 160..4000 and h 120..4000")
         self.out = []
         self.pre = str(spec.get("prefix", ""))
         self.suf = str(spec.get("suffix", ""))
@@ -202,8 +225,11 @@ class Canvas:
             y1 = y2 = math.floor(y1) + 0.5
         if x1 == x2 and w == 1:
             x1 = x2 = math.floor(x1) + 0.5
-        self.add(f'<path d="M{n(x1)} {n(y1)}L{n(x2)} {n(y2)}" stroke="{stroke}"'
-                 + (f' stroke-width="{w}"' if w != 1 else "") + "/>")
+        self.add(
+            f'<path d="M{n(x1)} {n(y1)}L{n(x2)} {n(y2)}" stroke="{stroke}"'
+            + (f' stroke-width="{w}"' if w != 1 else "")
+            + "/>"
+        )
 
     def rect(self, x, y, w, h, fill, extra=""):
         self.add(f'<rect x="{n(x)}" y="{n(y)}" width="{n(w)}" height="{n(h)}" fill="{fill}"{extra}/>')
@@ -218,8 +244,10 @@ class Canvas:
             r = min(r, h / 2, L)
             x0, x1 = x, x + w
             k = 1 if w > 0 else -1
-            d = (f"M{n(x0)} {n(y)}H{n(x1 - k * r)}Q{n(x1)} {n(y)} {n(x1)} {n(y + r)}"
-                 f"V{n(y + h - r)}Q{n(x1)} {n(y + h)} {n(x1 - k * r)} {n(y + h)}H{n(x0)}Z")
+            d = (
+                f"M{n(x0)} {n(y)}H{n(x1 - k * r)}Q{n(x1)} {n(y)} {n(x1)} {n(y + r)}"
+                f"V{n(y + h - r)}Q{n(x1)} {n(y + h)} {n(x1 - k * r)} {n(y + h)}H{n(x0)}Z"
+            )
         else:
             L = abs(h)
             if L < 0.5:
@@ -227,8 +255,10 @@ class Canvas:
             r = min(r, w / 2, L)
             y0, y1 = y, y - h
             k = 1 if h > 0 else -1
-            d = (f"M{n(x)} {n(y0)}V{n(y1 + k * r)}Q{n(x)} {n(y1)} {n(x + r)} {n(y1)}"
-                 f"H{n(x + w - r)}Q{n(x + w)} {n(y1)} {n(x + w)} {n(y1 + k * r)}V{n(y0)}Z")
+            d = (
+                f"M{n(x)} {n(y0)}V{n(y1 + k * r)}Q{n(x)} {n(y1)} {n(x + r)} {n(y1)}"
+                f"H{n(x + w - r)}Q{n(x + w)} {n(y1)} {n(x + w)} {n(y1 + k * r)}V{n(y0)}Z"
+            )
         self.add(f'<path d="{d}" fill="{fill}"/>')
 
     def colors(self, names):
@@ -271,10 +301,11 @@ class Canvas:
         th = self.th
         title = self.s.get("title")
         bg = self.s.get("bg", th["bg"])
-        head = (f'<svg xmlns="http://www.w3.org/2000/svg" width="{self.W}" height="{self.H}" '
-                f'viewBox="0 0 {self.W} {self.H}" font-family="{FONT}" font-size="12" '
-                f'fill="{th["fg"]}" role="img"'
-                + (f' aria-label="{escape(str(title))}"' if title else "") + ">")
+        head = (
+            f'<svg xmlns="http://www.w3.org/2000/svg" width="{self.W}" height="{self.H}" '
+            f'viewBox="0 0 {self.W} {self.H}" font-family="{FONT}" font-size="12" '
+            f'fill="{th["fg"]}" role="img"' + (f' aria-label="{escape(str(title))}"' if title else "") + ">"
+        )
         parts = [head]
         if title:
             parts.append(f"<title>{escape(str(title))}</title>")
@@ -286,6 +317,7 @@ class Canvas:
 
 
 # ---------------------------------------------------------------- data
+
 
 def cat_series(s):
     """Normalise categorical data to (labels, {name: [values]})."""
@@ -321,6 +353,8 @@ def cat_series(s):
         raise SpecError(f'"x" has {len(x)} labels but series have {len(next(iter(ser.values())))} values')
     if not x:
         raise SpecError("no data")
+    if len(x) * len(ser) > MAX_POINTS:
+        raise SpecError(f"too many values (max {MAX_POINTS}); aggregate the data first")
     out = {}
     for nm, vals in ser.items():
         out[str(nm)] = [_num(v, f"series {nm!r}") for v in vals]
@@ -332,6 +366,7 @@ def _named(names):
 
 
 # ---------------------------------------------------------------- cartesian frame
+
 
 class Plot:
     """Axes with a linear y scale and a categorical ("cat") or linear ("lin") x scale."""
@@ -423,6 +458,7 @@ class Plot:
 
 # ---------------------------------------------------------------- chart types
 
+
 def _sort(s, cats, ser):
     order = s.get("sort")
     if not order:
@@ -506,8 +542,11 @@ def _hbar(c, s, cats, ser, names, cols, stack, ng, lo, hi, top, labels):
     left = 16 + labw + 10
     vlab = 0
     if labels:
-        tot = ([sum(max(0, v[i] or 0) for v in ser.values()) for i in range(len(cats))] if stack
-               else [v for vs in ser.values() for v in vs if v is not None])
+        tot = (
+            [sum(max(0, v[i] or 0) for v in ser.values()) for i in range(len(cats))]
+            if stack
+            else [v for vs in ser.values() for v in vs if v is not None]
+        )
         vlab = max(text_w(c.f(v), 11) for v in tot) + 8
     right = 16 + vlab
     bottom = 30 + (20 if s.get("xlabel") else 0)
@@ -551,8 +590,7 @@ def _hbar(c, s, cats, ser, names, cols, stack, ng, lo, hi, top, labels):
                 by, bhj = gy + j * inner + gap / 2, inner - gap
                 c.bar(X(0), by, X(v) - X(0), bhj, cols[j], horizontal=True)
                 if labels and bhj >= 9:
-                    c.text(X(v) + (5 if v >= 0 else -5), by + bhj / 2 + 4, c.f(v), 11,
-                           anchor=None if v >= 0 else "end")
+                    c.text(X(v) + (5 if v >= 0 else -5), by + bhj / 2 + 4, c.f(v), 11, anchor=None if v >= 0 else "end")
     zx = X(0) if x0 <= 0 <= x1 else L
     c.line(zx, T, zx, B, th["axis"])
     if s.get("xlabel"):
@@ -632,8 +670,10 @@ def line(c, s, area=False):
             if area:
                 poly = seg + [(seg[-1][0], base), (seg[0][0], base)]
                 c.add(f'<path d="{_pathd(poly)}Z" fill="{col}" fill-opacity="{".22" if one else ".14"}"/>')
-            c.add(f'<path d="{_pathd(seg)}" fill="none" stroke="{col}" stroke-width="2.25" '
-                  'stroke-linejoin="round" stroke-linecap="round"/>')
+            c.add(
+                f'<path d="{_pathd(seg)}" fill="none" stroke="{col}" stroke-width="2.25" '
+                'stroke-linejoin="round" stroke-linecap="round"/>'
+            )
         show_dots = s.get("dots", len(xs) <= 24)
         for (x, y), v in zip(pts, vs):
             if y is None:
@@ -652,6 +692,8 @@ def scatter(c, s):
     if not isinstance(ser, dict):
         raise SpecError('scatter needs "data": [[x, y], ...] or "series": {name: [[x, y], ...]}')
     pts = {}
+    if sum(len(v) for v in ser.values() if isinstance(v, list)) > MAX_POINTS:
+        raise SpecError(f"too many points (max {MAX_POINTS}); sample the data first")
     for nm, ps in ser.items():
         if not isinstance(ps, list) or not ps:
             raise SpecError(f"series {nm!r}: expected a list of [x, y] points")
@@ -670,7 +712,7 @@ def scatter(c, s):
         top = c.legend(list(zip(names, cols)), top)
     allp = [p for ps in pts.values() for p in ps]
     xs, ys = [p[0] for p in allp], [p[1] for p in allp]
-    pad = lambda a, b: ((b - a) * 0.04 or 1)  # noqa: E731
+    pad = lambda a, b: (b - a) * 0.04 or 1  # noqa: E731
     px, py = pad(min(xs), max(xs)), pad(min(ys), max(ys))
     p = Plot(c, top, min(ys) - py, max(ys) + py, ("lin", min(xs) - px, max(xs) + px), vgrid=True)
     smax = max((q[2] for q in allp if q[2]), default=0)
@@ -678,8 +720,10 @@ def scatter(c, s):
     for j, nm in enumerate(names):
         for x, y, size, lab in pts[nm]:
             r = 3 + 13 * math.sqrt(size / smax) if size and smax > 0 else 4.5
-            c.add(f'<circle cx="{n(p.x(x))}" cy="{n(p.y(y))}" r="{n(r)}" fill="{cols[j]}" '
-                  f'fill-opacity=".75" stroke="{bg}" stroke-width=".75"/>')
+            c.add(
+                f'<circle cx="{n(p.x(x))}" cy="{n(p.y(y))}" r="{n(r)}" fill="{cols[j]}" '
+                f'fill-opacity=".75" stroke="{bg}" stroke-width=".75"/>'
+            )
             if lab:
                 c.text(p.x(x) + r + 3, p.y(y) + 4, fit(lab, 11, 140), 11)
     p.finish(zero=False)
@@ -689,8 +733,12 @@ def histogram(c, s):
     vals = s.get("values", s.get("data"))
     if not isinstance(vals, list) or not vals:
         raise SpecError('histogram needs "values": [numbers]')
+    if len(vals) > 100 * MAX_POINTS:
+        raise SpecError(f"too many values (max {100 * MAX_POINTS})")
     vals = [_num(v, "values") for v in vals if v is not None]
     nb = int(s.get("bins") or math.ceil(math.log2(len(vals)) + 1))
+    if not 1 <= nb <= 200:
+        raise SpecError('"bins" must be 1..200')
     lo, hi = min(vals), max(vals)
     if hi == lo:
         hi = lo + 1
@@ -734,7 +782,7 @@ def pie(c, s, donut=False):
         items.sort(key=lambda t: -t[1])
     mx = int(s.get("max_slices", 8))
     if len(items) > mx:
-        items = items[:mx - 1] + [("Other", sum(v for _, v in items[mx - 1:]))]
+        items = items[: mx - 1] + [("Other", sum(v for _, v in items[mx - 1 :]))]
     total = sum(v for _, v in items)
     cols = c.colors([k for k, _ in items])
     if any(k == "Other" for k, _ in items[-1:]) and len(items) > mx - 1 and not s.get("colors"):
@@ -768,15 +816,17 @@ def pie(c, s, donut=False):
     bg = th["bg"]
     a0 = -math.pi / 2
     P = lambda rad, a: (cx + rad * math.cos(a), cy + rad * math.sin(a))  # noqa: E731
-    for i, (k, v) in enumerate(items):
+    for i, (_, v) in enumerate(items):
         share = v / total
         a1 = a0 + 2 * math.pi * share
         col = cols[i]
         if len(items) == 1:
             if donut:
-                c.add(f'<path d="M{n(cx - r)} {n(cy)}a{n(r)} {n(r)} 0 1 0 {n(2 * r)} 0a{n(r)} {n(r)} 0 1 0 {n(-2 * r)} 0Z'
-                      f'M{n(cx - ri)} {n(cy)}a{n(ri)} {n(ri)} 0 1 1 {n(2 * ri)} 0a{n(ri)} {n(ri)} 0 1 1 {n(-2 * ri)} 0Z" '
-                      f'fill="{col}" fill-rule="evenodd"/>')
+                c.add(
+                    f'<path d="M{n(cx - r)} {n(cy)}a{n(r)} {n(r)} 0 1 0 {n(2 * r)} 0a{n(r)} {n(r)} 0 1 0 {n(-2 * r)} 0Z'
+                    f'M{n(cx - ri)} {n(cy)}a{n(ri)} {n(ri)} 0 1 1 {n(2 * ri)} 0a{n(ri)} {n(ri)} 0 1 1 {n(-2 * ri)} 0Z" '
+                    f'fill="{col}" fill-rule="evenodd"/>'
+                )
             else:
                 c.add(f'<circle cx="{n(cx)}" cy="{n(cy)}" r="{n(r)}" fill="{col}"/>')
         else:
@@ -784,8 +834,10 @@ def pie(c, s, donut=False):
             (ox0, oy0), (ox1, oy1) = P(r, a0), P(r, a1)
             if donut:
                 (ix0, iy0), (ix1, iy1) = P(ri, a0), P(ri, a1)
-                d = (f"M{n(ox0)} {n(oy0)}A{n(r)} {n(r)} 0 {large} 1 {n(ox1)} {n(oy1)}"
-                     f"L{n(ix1)} {n(iy1)}A{n(ri)} {n(ri)} 0 {large} 0 {n(ix0)} {n(iy0)}Z")
+                d = (
+                    f"M{n(ox0)} {n(oy0)}A{n(r)} {n(r)} 0 {large} 1 {n(ox1)} {n(oy1)}"
+                    f"L{n(ix1)} {n(iy1)}A{n(ri)} {n(ri)} 0 {large} 0 {n(ix0)} {n(iy0)}Z"
+                )
             else:
                 d = f"M{n(cx)} {n(cy)}L{n(ox0)} {n(oy0)}A{n(r)} {n(r)} 0 {large} 1 {n(ox1)} {n(oy1)}Z"
             c.add(f'<path d="{d}" fill="{col}" stroke="{bg}" stroke-width="1.5" stroke-linejoin="round"/>')
@@ -805,6 +857,7 @@ def pie(c, s, donut=False):
 
 
 # ---------------------------------------------------------------- entry points
+
 
 def _load(spec):
     if isinstance(spec, (str, bytes)):
