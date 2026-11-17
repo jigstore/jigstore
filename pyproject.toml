@@ -9,7 +9,7 @@ description = "Deterministic tools for AI agents: write a short spec instead of 
 readme = "README.md"
 license = { text = "MIT" }
 authors = [{ name = "Ankit Sharma" }]
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 dependencies = []
 keywords = ["ai-agents", "llm", "tools", "charts", "svg", "token-efficient"]
 classifiers = [

@@ -19,7 +19,7 @@ pip install "git+https://github.com/ankit22sharma/agent-tools"
 pip install "agent-tools[png] @ git+https://github.com/ankit22sharma/agent-tools"
 ```
 
-No runtime dependencies. Python 3.9+.
+No runtime dependencies. Python 3.10+.
 
 ## Chart builder
 
