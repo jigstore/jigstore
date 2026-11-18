@@ -26,19 +26,24 @@ Run all three before you finish. There is no build step.
 | `src/jigstore/chart/render.py` | the chart jig: spec in, SVG string out. `render()` dispatches by `type` |
 | `src/jigstore/chart/png.py` | optional PNG via cairosvg or rsvg-convert |
 | `src/jigstore/chart/USAGE.md` | the spec format agents read. Shipped in the package |
+| `src/jigstore/table/render.py` | the table jig: rows or a CSV/JSON file in, md/svg/html/csv out (`render_table`, `save_table`) |
+| `examples/tables.json`, `examples/data/` | table examples and the CSV they read |
 | `src/jigstore/cli.py` | `jigstore list / docs / chart / mcp` |
-| `src/jigstore/mcp.py` | stdio MCP server. `Toolset` lets the hosted service reuse it |
+| `src/jigstore/mcp.py` | stdio MCP server with one `jig` tool; `JIGS` maps names to handlers. `Toolset` lets the hosted service reuse it |
 | `src/jigstore/__init__.py` | `CATALOG` of jigs and `__version__` |
 | `examples/specs.json` | one spec per example; covers every chart type |
-| `tests/` | `test_chart` (examples, CLI), `test_features` (options, security), `test_mcp`, `test_fuzz` |
+| `tests/` | `test_chart` (examples, CLI), `test_features` (options, security), `test_table`, `test_mcp`, `test_fuzz` (charts and tables) |
 
 ## Rules that tests enforce
 
 - **Deterministic.** Same spec, same bytes. No randomness, time or environment in output.
 - **No runtime dependencies.** Optional extras only (`[png]`).
-- **Token budgets.** `USAGE.md` stays under 300 tokens (~1,200 characters). The MCP
-  tool schema stays under 150 tokens (`test_tool_schema_is_small`). Every example SVG
-  stays under 8 KB.
+- **Token budgets.** Each `USAGE.md` stays under 300 tokens (~1,200 characters). The whole
+  MCP tool list stays under 150 tokens (`test_tool_schema_is_small`): add jigs to the
+  `jig` tool's enum, never as new tools. Every example SVG stays under 8 KB.
+- **Files.** Only the CLI and the local MCP server may read files (`from`), always
+  through a `base_dir` and never outside it. Library calls default to refusing `from`, which
+  is what the hosted service relies on.
 - **Every bad spec raises `SpecError`** with one line that says how to fix it. Any other
   exception is a bug; the fuzz test checks this.
 - **Untrusted input.** Escape all text with `escape()`. Never put a spec value into an
@@ -59,8 +64,9 @@ Run all three before you finish. There is no build step.
 
 ## Adding a new jig
 
-Create `src/jigstore/<name>/` with `render.py`, `USAGE.md` and `__init__.py`, add it to
-`CATALOG`, a CLI subcommand in `cli.py`, an MCP handler in `mcp.py`, examples and tests.
+Create `src/jigstore/<name>/` with `render.py`, `USAGE.md` and `__init__.py` (the table
+jig is the model to copy), add it to `CATALOG`, a CLI subcommand in `cli.py`, a handler in
+`JIGS` and the `jig` enum in `mcp.py`, examples in `scripts/build_examples.py`, tests and fuzz.
 Read `CONTRIBUTING.md` first: new jigs need an issue agreeing on the spec format.
 
 ## Conventions

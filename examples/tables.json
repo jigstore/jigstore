@@ -1,0 +1,111 @@
+{
+  "table-revenue": {
+    "title": "Revenue by region",
+    "subtitle": "Q3, sorted by revenue",
+    "from": "data/regions.csv",
+    "columns": [
+      "Region",
+      {
+        "key": "Revenue",
+        "format": "money"
+      },
+      {
+        "key": "Growth",
+        "format": "percent",
+        "decimals": 1,
+        "color": "sign"
+      },
+      "Deals"
+    ],
+    "sort": "Revenue",
+    "max_rows": 10,
+    "total": {
+      "Region": "Total (all 20)",
+      "Revenue": "sum",
+      "Deals": "sum"
+    }
+  },
+  "table-scorecard": {
+    "title": "Service scorecard",
+    "columns": [
+      "Service",
+      {
+        "key": "Uptime",
+        "format": "percent",
+        "decimals": 3
+      },
+      {
+        "key": "Latency",
+        "suffix": " ms",
+        "color": "scale"
+      },
+      {
+        "key": "Trend",
+        "format": "sparkline"
+      },
+      {
+        "key": "Errors",
+        "format": "bar"
+      }
+    ],
+    "rows": [
+      [
+        "API",
+        99.98,
+        182,
+        [
+          190,
+          185,
+          200,
+          182,
+          176
+        ],
+        12
+      ],
+      [
+        "Search",
+        99.91,
+        240,
+        [
+          210,
+          230,
+          260,
+          250,
+          240
+        ],
+        31
+      ],
+      [
+        "Auth",
+        99.995,
+        95,
+        [
+          110,
+          100,
+          98,
+          96,
+          95
+        ],
+        4
+      ],
+      [
+        "Billing",
+        99.7,
+        410,
+        [
+          300,
+          350,
+          390,
+          420,
+          410
+        ],
+        58
+      ]
+    ],
+    "highlight": {
+      "where": {
+        "Service": "Billing"
+      }
+    }
+  }
+}

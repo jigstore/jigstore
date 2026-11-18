@@ -130,6 +130,22 @@ class Security(unittest.TestCase):
                 with self.assertRaises(SpecError):
                     render(dict({"data": {"a": 1}}, **spec))
 
+    def test_all_null_values(self):
+        # found by the CI fuzz job (seed 8959): hbar with only nulls crashed on max() of nothing
+        for t in ("hbar", "bar", "line", "area"):
+            with self.subTest(t):
+                try:
+                    render({"type": t, "data": {"a": None}, "ymin": 728.13})
+                except SpecError:
+                    pass
+
+    def test_tiny_values(self):
+        # found by the CI fuzz job (seed 24141): 1e-12 collapsed the axis to zero height
+        for t in ("line", "bar", "hbar", "area", "scatter"):
+            with self.subTest(t):
+                data = [[1e-12, 1e-12]] if t == "scatter" else {"a": 1e-12}
+                ET.fromstring(render({"type": t, "data": data}))
+
     def test_long_labels_are_fast(self):
         t = time.perf_counter()
         ok({"title": "x" * 200_000, "data": {"y" * 200_000: 1, "b": 2}})

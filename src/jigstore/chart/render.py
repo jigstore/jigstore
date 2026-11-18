@@ -158,7 +158,8 @@ def ticks(lo, hi, count=5):
     start = math.floor(lo / step + 1e-9) * step
     end = math.ceil(hi / step - 1e-9) * step
     k = max(1, int(round((end - start) / step)))
-    return [round(start + i * step, 10) for i in range(k + 1)], step
+    digits = max(10, 3 - math.floor(math.log10(step)))  # keep very small steps distinct
+    return [round(start + i * step, digits) for i in range(k + 1)], step
 
 
 def _decimals(step):
@@ -551,6 +552,8 @@ class Plot:
         if self.H < 40 or self.W < 60:
             raise SpecError("not enough room for the plot; increase w/h or shorten labels")
         self.y0, self.y1 = self.yt[0], self.yt[-1]
+        if self.y1 == self.y0:  # never divide by a zero-height axis
+            self.y1 = self.y0 + 1
         for v, t in zip(self.yt, ylab):
             yy = self.y(v)
             if c.grid:
@@ -722,7 +725,7 @@ def _hbar(c, s, cats, ser, names, cols, stack, ng, lo, hi, top, labels, cat_cols
             if stack
             else [v for vs in ser.values() for v in vs if v is not None]
         )
-        vlab = max(text_w(c.f(v), 11) for v in tot) + 8
+        vlab = max((text_w(c.f(v), 11) for v in tot), default=0) + 8
     right = 16 + vlab
     bottom = 30 + (20 if s.get("xlabel") else 0)
     refs = parse_refs(s)

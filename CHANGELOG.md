@@ -8,6 +8,14 @@ All notable changes are listed here. The format follows
 
 ### Added
 
+- **Table jig** (`jigstore table`): rows or a CSV/JSON file (`"from"`) to Markdown (default),
+  SVG, PNG, HTML or CSV. Column formats money, percent (whole numbers), number, date, bar,
+  sparkline; sign and scale coloring; totals; sort; highlight; image row limit 25 by default.
+  CSV output neutralises spreadsheet formulas.
+- The MCP server exposes a single `jig` tool (`{"jig": "chart" | "table", "spec": ...}`) so the
+  per-turn schema stays the same size as the catalog grows. The old `chart` tool name still works.
+- Benchmarks now include time: about 0.5 s with a spec instead of 5 to 30 s writing the output.
+
 - Chart types: `waterfall` (with a closing `total`), `funnel`, `heatmap` and `sparkline`.
 - Chart options: `highlight`, `refs` (reference lines), `stack: "percent"`,
   `curve: "smooth" | "step"`, `ymin`/`ymax`, `decimals`, `legend: top|bottom|none`,

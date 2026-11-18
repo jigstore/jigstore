@@ -34,6 +34,10 @@ def main(argv=None) -> int:
     c.add_argument("spec", help="JSON string, @file.json, or - for stdin")
     c.add_argument("-o", "--out", default="chart.svg", help="output .svg/.png path, or - for SVG on stdout")
     c.add_argument("--scale", type=float, default=2.0, help="PNG pixel scale (default 2)")
+    t = sub.add_parser("table", help="render a table from a JSON spec or a CSV/JSON file")
+    t.add_argument("spec", help="JSON string, @file.json, or - for stdin")
+    t.add_argument("-o", "--out", default=None, help="output .md/.svg/.png/.html/.csv; default prints Markdown")
+    t.add_argument("--scale", type=float, default=2.0, help="PNG pixel scale (default 2)")
     a = ap.parse_args(argv)
     for stream in (sys.stdin, sys.stdout):
         if hasattr(stream, "reconfigure"):
@@ -59,6 +63,21 @@ def main(argv=None) -> int:
                 sys.stdout.write(render(spec) + "\n")
             else:
                 print(save(spec, a.out, a.scale))
+        except (SpecError, OSError) as e:
+            print(f"error: {e}", file=sys.stderr)
+            return 2
+        return 0
+    if a.cmd == "table":
+        import os
+
+        from .table import SpecError, render_table, save_table
+
+        try:
+            spec = _read_spec(a.spec)
+            if a.out in (None, "-"):
+                sys.stdout.write(render_table(spec, "md", os.getcwd()))
+            else:
+                print(save_table(spec, a.out, os.getcwd(), a.scale))
         except (SpecError, OSError) as e:
             print(f"error: {e}", file=sys.stderr)
             return 2
