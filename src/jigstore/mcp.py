@@ -27,7 +27,7 @@ TOOLS = [
         "description": (
             "Render a chart from a small JSON spec; returns the file path. "
             'Example spec: {"type":"bar","title":"Sales","data":{"N":12,"S":9}}. '
-            "Types: bar hbar line area scatter pie donut histogram. "
+            "Types: bar hbar line area scatter pie donut histogram waterfall funnel heatmap sparkline. "
             "Bad specs return the full format."
         ),
         "inputSchema": {
