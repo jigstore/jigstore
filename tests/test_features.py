@@ -139,6 +139,13 @@ class Security(unittest.TestCase):
                 except SpecError:
                     pass
 
+    def test_tiny_values(self):
+        # found by the CI fuzz job (seed 24141): 1e-12 collapsed the axis to zero height
+        for t in ("line", "bar", "hbar", "area", "scatter"):
+            with self.subTest(t):
+                data = [[1e-12, 1e-12]] if t == "scatter" else {"a": 1e-12}
+                ET.fromstring(render({"type": t, "data": data}))
+
     def test_long_labels_are_fast(self):
         t = time.perf_counter()
         ok({"title": "x" * 200_000, "data": {"y" * 200_000: 1, "b": 2}})
