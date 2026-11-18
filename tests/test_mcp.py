@@ -41,7 +41,7 @@ class Legacy(unittest.TestCase):
             )
             self.assertEqual([m["id"] for m in r], [1, 2, 3])
             self.assertEqual(r[0]["result"]["protocolVersion"], "2025-06-18")
-            self.assertEqual(r[1]["result"]["tools"][0]["name"], "chart")
+            self.assertEqual(r[1]["result"]["tools"][0]["name"], "jig")
             self.assertFalse(r[2]["result"]["isError"])
             self.assertEqual(os.path.realpath(r[2]["result"]["content"][0]["text"]), os.path.realpath(out))
             self.assertTrue(os.path.exists(out))
@@ -94,6 +94,42 @@ class Modern(unittest.TestCase):
         )[0]
         self.assertEqual(r["error"]["code"], -32022)
         self.assertIn("2026-07-28", r["error"]["data"]["supported"])
+
+
+class Jigs(unittest.TestCase):
+    def call(self, args):
+        return run({"jsonrpc": "2.0", "id": 1, "method": "tools/call", "params": {"name": "jig", "arguments": args}})[
+            0
+        ]["result"]
+
+    def test_table_returns_markdown(self):
+        r = self.call({"jig": "table", "spec": {"rows": [{"a": 1}]}})
+        self.assertFalse(r["isError"])
+        self.assertIn("| a |", r["content"][0]["text"])
+
+    def test_table_bad_spec_returns_table_usage(self):
+        r = self.call({"jig": "table", "spec": {"rows": 5}})
+        self.assertTrue(r["isError"])
+        self.assertIn("# table", r["content"][0]["text"])
+
+    def test_unknown_jig(self):
+        r = self.call({"jig": "nope", "spec": {}})
+        self.assertTrue(r["isError"])
+
+    def test_old_chart_tool_still_works(self):
+        with tempfile.TemporaryDirectory() as d:
+            r = run(
+                {
+                    "jsonrpc": "2.0",
+                    "id": 1,
+                    "method": "tools/call",
+                    "params": {
+                        "name": "chart",
+                        "arguments": {"spec": {"data": {"a": 1}}, "out": os.path.join(d, "c.svg")},
+                    },
+                }
+            )
+            self.assertFalse(r[0]["result"]["isError"])
 
 
 class Behaviour(unittest.TestCase):

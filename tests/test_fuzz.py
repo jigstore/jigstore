@@ -10,6 +10,7 @@ import unittest
 import xml.etree.ElementTree as ET
 
 from jigstore.chart import TYPES, SpecError, render
+from jigstore.table import render_table
 
 SEED = int(os.environ.get("JIGSTORE_FUZZ_SEED", "1234"))
 N = int(os.environ.get("JIGSTORE_FUZZ_N", "1500"))
@@ -77,6 +78,89 @@ class Fuzz(unittest.TestCase):
             except ET.ParseError as e:
                 self.fail(f"case {i}: invalid SVG ({e})\nspec={spec!r}")
             self.assertNotIn("<script", svg)
+
+
+def rtable(r):
+    ncols = r.randint(0, 6)
+
+    # mostly valid column names, with some hostile ones mixed in
+    # mostly valid column names and options, with a few hostile ones mixed in
+    def rare(good, bad, p=0.04):
+        return r.choice(bad) if r.random() < p else good
+
+    keys = [rare(f"c{i}", [rtext(r), 3, "<b>|x", ""]) for i in range(ncols)]
+    cols = []
+    for k in keys:
+        if r.random() < 0.5:
+            cols.append(k)
+        else:
+            cols.append(
+                {
+                    "key": k,
+                    "format": rare(
+                        r.choice(("text", "number", "money", "percent", None)), ["date", "bar", "sparkline", "x"], 0.2
+                    ),
+                    "decimals": rare(r.choice([None, 0, 2]), [9, "x"]),
+                    "color": rare(r.choice([None, "sign", "scale", "#fff"]), ["x", 'red" onload="x']),
+                    "align": rare(r.choice(["left", "right", "center"]), ["x"]),
+                }
+            )
+
+    def cell(r, col):
+        f = col.get("format") if isinstance(col, dict) else None
+        if r.random() < 0.9:  # plausible cells most of the time
+            if f in ("number", "money", "percent", "bar"):
+                return round(r.uniform(-1e5, 1e5), 2)
+            if f == "sparkline":
+                return [r.randint(0, 9) for _ in range(r.randint(2, 8))]
+            if f == "date":
+                return "2026-11-19"
+            return r.choice(["North", r.randint(0, 999), 3.5, "a|b"])
+        return r.choice([rnum(r), rtext(r), [rnum(r) for _ in range(r.randint(0, 4))], None])
+
+    width = r.choice([ncols, ncols, ncols, ncols + 1])
+    rows = [[cell(r, cols[j] if j < len(cols) else None) for j in range(width)] for _ in range(r.randint(0, 30))]
+    if r.random() < 0.3:
+        rows = [dict(zip([str(k) for k in keys], row)) for row in rows]
+    s = {"columns": cols, "rows": rows}
+    if r.random() < 0.3 and keys:
+        s["total"] = {str(r.choice(keys)): r.choice(["sum", "avg", "min", "max", "Total"])}
+    if r.random() < 0.3 and keys:
+        s["sort"] = r.choice(
+            [str(r.choice(keys)), {"by": str(r.choice(keys)), "order": r.choice(["asc", "desc", "x"])}]
+        )
+    if r.random() < 0.2:
+        s["highlight"] = r.choice([{"row": r.randint(-1, 5)}, {"where": {str(keys[0]) if keys else "a": rtext(r)}}, 5])
+    for key, gen in (
+        ("title", rtext),
+        ("max_rows", rnum),
+        ("theme", lambda r: r.choice(["light", "dark", "x"])),
+        ("w", lambda r: r.choice([100, 400, 900, "x"])),
+        ("from", lambda r: "data.csv"),
+    ):
+        if r.random() < (0.02 if key == "from" else 0.1):
+            s[key] = gen(r)
+    return s
+
+
+class FuzzTable(unittest.TestCase):
+    def test_random_tables(self):
+        r = random.Random(SEED)
+        for i in range(N):
+            spec = rtable(r)
+            for out in ("md", "svg", "html", "csv"):
+                try:
+                    text = render_table(spec, out)
+                except SpecError:
+                    break
+                except Exception as e:  # noqa: BLE001
+                    self.fail(f"case {i} {out}: {type(e).__name__}: {e}\nspec={spec!r}")
+                if out == "svg":
+                    try:
+                        ET.fromstring(text)
+                    except ET.ParseError as e:
+                        self.fail(f"case {i}: invalid SVG ({e})\nspec={spec!r}")
+                self.assertNotIn("<script", text)
 
 
 if __name__ == "__main__":

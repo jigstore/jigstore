@@ -21,23 +21,25 @@ LEGACY = ["2025-11-25", "2025-06-18", "2025-03-26", "2024-11-05"]
 SERVER_INFO = {"name": "jigstore", "version": __version__}
 PV = "io.modelcontextprotocol/protocolVersion"
 
+# One tool for every jig keeps the per-turn schema cost flat as the catalog grows.
 TOOLS = [
     {
-        "name": "chart",
+        "name": "jig",
         "description": (
-            "Render a chart from a small JSON spec; returns the file path. "
-            'Example spec: {"type":"bar","title":"Sales","data":{"N":12,"S":9}}. '
-            "Types: bar hbar line area scatter pie donut histogram waterfall funnel heatmap sparkline. "
+            "Make a chart or table from a short JSON spec instead of writing it yourself. "
+            "chart returns a file path; table returns Markdown unless out is set. "
+            'Example: {"jig":"chart","spec":{"type":"bar","data":{"N":12,"S":9}}}. '
             "Bad specs return the full format."
         ),
         "inputSchema": {
             "type": "object",
             "properties": {
-                "spec": {"type": "object", "description": "chart spec"},
-                "out": {"type": "string", "description": "path ending .svg or .png (optional)"},
-                "view": {"type": "boolean", "description": "also return a PNG to look at"},
+                "jig": {"type": "string", "enum": ["chart", "table"]},
+                "spec": {"type": "object"},
+                "out": {"type": "string", "description": "file path; extension picks the format"},
+                "view": {"type": "boolean", "description": "also return a PNG"},
             },
-            "required": ["spec"],
+            "required": ["jig", "spec"],
         },
     }
 ]
@@ -53,10 +55,15 @@ class ToolError(Exception):
     """A tool failed in a way the model can fix; returned as isError content."""
 
 
-def _usage():
+def _usage(name="chart"):
     from importlib import resources
 
-    return resources.files("jigstore.chart").joinpath("USAGE.md").read_text(encoding="utf-8")
+    return resources.files(f"jigstore.{name}").joinpath("USAGE.md").read_text(encoding="utf-8")
+
+
+def _base_dir():
+    root = os.environ.get("JIGSTORE_OUT_DIR")
+    return os.path.realpath(os.path.expanduser(root)) if root else os.getcwd()
 
 
 def _out_path(out, svg):
@@ -95,8 +102,51 @@ def call_chart(args: dict, ctx: dict | None = None) -> list:
         raise ToolError(f"error: {e}\n\n{_usage()}") from None
 
 
-HANDLERS = {"chart": call_chart}
-INSTRUCTIONS = "Call chart with a JSON spec instead of writing SVG yourself."
+def call_table(args: dict, ctx: dict | None = None) -> list:
+    from .chart import to_png
+    from .table import SpecError, render_table, save_table
+
+    spec = args.get("spec")
+    base = _base_dir()
+    try:
+        if isinstance(spec, str):
+            spec = json.loads(spec)
+        out = args.get("out")
+        if not out:
+            content = [{"type": "text", "text": render_table(spec, "md", base)}]
+        else:
+            path = os.path.realpath(os.path.join(base, os.path.expanduser(out)))
+            if os.environ.get("JIGSTORE_OUT_DIR") and os.path.commonpath([base, path]) != base:
+                raise ToolError(f"error: out must be inside {base}")
+            os.makedirs(os.path.dirname(path), exist_ok=True)
+            save_table(spec, path, base)
+            content = [{"type": "text", "text": path}]
+        if args.get("view"):
+            try:
+                png = to_png(render_table(spec, "svg", base), 1.0)
+            except SpecError as e:
+                content.append({"type": "text", "text": f"(no preview: {e})"})
+            else:
+                content.append({"type": "image", "mimeType": "image/png", "data": base64.b64encode(png).decode()})
+        return content
+    except (SpecError, ValueError, OSError) as e:
+        raise ToolError(f"error: {e}\n\n{_usage('table')}") from None
+
+
+JIGS = {"chart": call_chart, "table": call_table}
+
+
+def call_jig(args: dict, ctx: dict | None = None) -> list:
+    name = args.get("jig")
+    fn = JIGS.get(name)
+    if fn is None:
+        raise ToolError(f'error: "jig" must be one of: {", ".join(JIGS)}')
+    return fn(args, ctx)
+
+
+# "chart" stays callable for configs written before the single "jig" tool; it is not listed.
+HANDLERS = {"jig": call_jig, "chart": call_chart}
+INSTRUCTIONS = "Call jig with a short JSON spec instead of writing charts or tables yourself."
 
 
 class Toolset:
