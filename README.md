@@ -15,7 +15,7 @@ Each tool is a jig in this catalog. The first one is a chart builder.
 
 | jig | what it does |
 |---|---|
-| [`chart`](src/jigstore/chart/USAGE.md) | bar, hbar, line, area, scatter, pie, donut, histogram from JSON to SVG or PNG |
+| [`chart`](src/jigstore/chart/USAGE.md) | 12 chart types (bar, line, area, scatter, pie, donut, histogram, waterfall, funnel, heatmap, sparkline) from JSON to SVG or PNG |
 
 ## Install
 
@@ -56,17 +56,35 @@ save({"type": "line", "x": ["Q1", "Q2"], "series": {"Web": [3, 5]}}, "out.png")
 | ![](examples/line.svg) | ![](examples/area.svg) | ![](examples/area-stacked.svg) |
 | ![](examples/scatter.svg) | ![](examples/pie.svg) | ![](examples/donut.svg) |
 | ![](examples/histogram.svg) | ![](examples/dark.svg) | ![](examples/negative.svg) |
+| ![](examples/waterfall.svg) | ![](examples/funnel.svg) | ![](examples/heatmap.svg) |
+| ![](examples/bar-highlight.svg) | ![](examples/bar-percent.svg) | ![](examples/line-smooth.svg) |
+
+Sparkline, for tables and text: ![](examples/sparkline.svg)
 
 Specs for every chart above are in [`examples/specs.json`](examples/specs.json).
+
+### Options that tell a story
+
+| Option | Example | What it does |
+|---|---|---|
+| `highlight` | `"highlight": "East"` | Keeps one category in color and greys out the rest |
+| `refs` | `"refs": [{"value": 1000, "label": "Target"}]` | Dashed reference line with a label |
+| `stack` | `"stack": "percent"` | 100% stacked bars or areas |
+| `curve` | `"curve": "smooth"` or `"step"` | Smooth lines that never overshoot the data, or steps |
+| `ymin`, `ymax` | `"ymin": 0` | Fix the value axis |
+| `legend` | `"legend": "bottom"` | `top`, `bottom` or `none` |
+| `palette` | `"palette": "colorblind"` | `default`, `colorblind` (Okabe-Ito), `mono`, `warm`, `cool` |
+| `decimals`, `grid`, `font` | `"decimals": 1, "grid": false` | Number format, gridlines, font family |
 
 ### What it handles for you
 
 - Round axis ticks and compact numbers (`$1.5M`, `40K`, `12%`).
 - Labels that fit: long category names are rotated or shortened, crowded axes skip labels.
-- Pie slices beyond 8 are grouped into "Other". Slice labels pick black or white text for contrast.
+- Pie slices beyond 8 are grouped into "Other". Slice and cell labels pick black or white text for contrast.
 - Gaps in line data (`null`) break the line instead of dropping to zero.
-- Light and dark themes, colorblind-friendly default palette, accessible `<title>`.
-- Small output: each example SVG is 2 to 4 KB with no scripts or external fonts.
+- Light and dark themes, colorblind-friendly palettes, accessible `<title>`.
+- Small output: most example SVGs are 2 to 4 KB with no scripts or external fonts.
+- Safe with untrusted specs: text is escaped and colors are validated. See [SECURITY.md](SECURITY.md).
 
 ### Token cost
 
@@ -88,7 +106,7 @@ install and a second round trip when the code fails.
 
 ## Using it from an agent
 
-**Shell access (cheapest).** Copy [`AGENTS.md`](AGENTS.md) into your agent's instructions,
+**Shell access (cheapest).** Copy [`docs/agent-prompt.md`](docs/agent-prompt.md) into your agent's instructions,
 or let the agent run `jigstore docs chart` when it needs the spec format (about
 200 tokens). Nothing is loaded into context until the tool is used.
 

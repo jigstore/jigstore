@@ -20,7 +20,7 @@ class Examples(unittest.TestCase):
                 svg = render(spec)
                 root = ET.fromstring(svg)
                 self.assertTrue(root.tag.endswith("svg"))
-                self.assertLess(len(svg), 6000, "output should stay compact")
+                self.assertLess(len(svg), 8000, "output should stay compact")
 
     def test_every_type_covered(self):
         seen = {s["type"] for s in SPECS.values()}
