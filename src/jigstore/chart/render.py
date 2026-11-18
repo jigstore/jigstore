@@ -722,7 +722,7 @@ def _hbar(c, s, cats, ser, names, cols, stack, ng, lo, hi, top, labels, cat_cols
             if stack
             else [v for vs in ser.values() for v in vs if v is not None]
         )
-        vlab = max(text_w(c.f(v), 11) for v in tot) + 8
+        vlab = max((text_w(c.f(v), 11) for v in tot), default=0) + 8
     right = 16 + vlab
     bottom = 30 + (20 if s.get("xlabel") else 0)
     refs = parse_refs(s)
