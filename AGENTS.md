@@ -1,5 +1,9 @@
 # AGENTS.md
 
+> Maintainers: project status, decisions and plans are in the private `jigstore-hq` repo
+> (sibling folder `../jigstore-hq`). Read its `STATUS.md` first and update it before you finish.
+> Contributors without access can ignore this; everything needed to work on the code is below.
+
 Instructions for coding agents working **on** this repo. (To **use** Jigstore from an
 agent, see `docs/agent-prompt.md`.)
 
